@@ -285,9 +285,12 @@
                 </div>
 
                 <div class="control-group">
-                    <label>🎵 Audio (mínimo 60 segundos)</label>
-                    <input type="file" id="audioFile" accept="audio/*" onchange="handleAudioFile(this)">
+                    <label>🎵 Audio (preferiblemente 60+ segundos)</label>
+                    <input type="file" id="audioFile" accept="audio/*,.mp3,.wav,.m4a,.aac,.ogg,.flac" onchange="handleAudioFile(this)">
                     <div class="file-info" id="audioInfo"></div>
+                    <small style="color: #6c757d; font-size: 12px;">
+                        Formatos soportados: MP3, WAV, M4A, AAC, OGG, FLAC
+                    </small>
                 </div>
 
                 <div class="control-group">
@@ -413,23 +416,55 @@
             const file = input.files[0];
             if (!file) return;
 
+            const info = document.getElementById('audioInfo');
+            showStatus(`⏳ Cargando audio: ${file.name}...`, 'info');
+
+            // Primero, aceptar el archivo y mostrar información básica
+            info.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB) - Verificando duración...`;
+            
             const audio = new Audio();
+            
+            // Timeout para manejar archivos que no cargan
+            const timeout = setTimeout(() => {
+                // Si no se puede verificar la duración, aceptar el archivo de todos modos
+                showStatus(`⚠️ No se pudo verificar la duración del audio, pero se ha cargado. Asegúrate de que tenga al menos 60 segundos.`, 'info');
+                info.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB) - Duración no verificada`;
+                audioFile = file;
+                input.parentElement.classList.add('has-file');
+            }, 3000);
+
             audio.onloadedmetadata = function() {
+                clearTimeout(timeout);
                 const duration = audio.duration;
-                const info = document.getElementById('audioInfo');
                 
-                if (duration < 60) {
+                if (duration && duration < 60) {
                     showStatus(`❌ El audio debe tener al menos 60 segundos. Duración actual: ${duration.toFixed(1)}s`, 'error');
                     input.value = '';
                     info.textContent = '';
                     audioFile = null;
+                    input.parentElement.classList.remove('has-file');
                     return;
                 }
                 
-                info.textContent = `${file.name} (${duration.toFixed(1)}s - ${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                if (duration) {
+                    info.textContent = `${file.name} (${duration.toFixed(1)}s - ${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                    showStatus(`✅ Audio cargado correctamente. Se utilizarán exactamente 60 segundos.`, 'success');
+                } else {
+                    info.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB) - Duración no determinada`;
+                    showStatus(`⚠️ Audio cargado. No se pudo determinar la duración exacta.`, 'info');
+                }
+                
                 audioFile = file;
                 input.parentElement.classList.add('has-file');
-                showStatus(`✅ Audio cargado correctamente. Se utilizarán exactamente 60 segundos.`, 'success');
+            };
+            
+            audio.onerror = function() {
+                clearTimeout(timeout);
+                // En caso de error, aún permitir el archivo
+                showStatus(`⚠️ No se pudo verificar el audio, pero se ha cargado. Formato: ${file.type || 'desconocido'}`, 'info');
+                info.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB) - Formato: ${file.type || 'desconocido'}`;
+                audioFile = file;
+                input.parentElement.classList.add('has-file');
             };
             
             audio.src = URL.createObjectURL(file);
@@ -523,8 +558,19 @@
         }
 
         async function exportVideo() {
-            if (!backgroundMedia || !audioFile) {
-                showStatus('❌ Por favor, carga todos los archivos necesarios', 'error');
+            if (!backgroundMedia) {
+                showStatus('❌ Por favor, carga una imagen o video de fondo', 'error');
+                return;
+            }
+
+            if (!audioFile) {
+                showStatus('❌ Por favor, carga un archivo de audio válido', 'error');
+                return;
+            }
+
+            const text = document.getElementById('messageText').value.trim();
+            if (!text) {
+                showStatus('❌ Por favor, escribe un mensaje', 'error');
                 return;
             }
 
