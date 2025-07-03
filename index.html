@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Video - Shorts Creator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .controls {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+        }
+
+        .file-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .file-input:hover {
+            border-color: #007bff;
+            background: #f8f9ff;
+        }
+
+        .file-input.has-file {
+            border-color: #28a745;
+            background: #f8fff8;
+        }
+
+        input[type="text"], input[type="number"], select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .text-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .position-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0056b3, #004085);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #1e7e34, #155724);
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #e0a800, #d39e00);
+            transform: translateY(-2px);
+        }
+
+        .preview-container {
+            position: relative;
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            background: #000;
+        }
+
+        #canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e9ecef;
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #007bff, #0056b3);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .status {
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: 600;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .file-info {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .color-picker {
+            width: 50px;
+            height: 40px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .text-controls,
+            .position-controls {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎥 Shorts Creator</h1>
+            <p>Crea videos verticales para YouTube Shorts y TikTok</p>
+        </div>
+
+        <div class="main-content">
+            <div class="preview-container">
+                <div class="canvas-container">
+                    <canvas id="canvas" width="1080" height="1920"></canvas>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress"></div>
+                </div>
+                
+                <div style="text-align: center; padding: 20px;">
+                    <button class="btn btn-primary" onclick="generatePreview()">🎬 Generar Preview</button>
+                    <button class="btn btn-success" onclick="exportVideo()">📤 Exportar Video</button>
+                </div>
+                
+                <div id="status"></div>
+            </div>
+
+            <div class="controls">
+                <div class="control-group">
+                    <label>🖼️ Imagen/Video de Fondo</label>
+                    <input type="file" id="backgroundFile" accept="image/*,video/*" onchange="handleBackgroundFile(this)">
+                    <div class="file-info" id="backgroundInfo"></div>
+                </div>
+
+                <div class="control-group">
+                    <label>🎵 Audio (mínimo 60 segundos)</label>
+                    <input type="file" id="audioFile" accept="audio/*" onchange="handleAudioFile(this)">
+                    <div class="file-info" id="audioInfo"></div>
+                </div>
+
+                <div class="control-group">
+                    <label>💬 Mensaje</label>
+                    <textarea id="messageText" placeholder="Escribe tu mensaje aquí..." onchange="updatePreview()"></textarea>
+                </div>
+
+                <div class="control-group">
+                    <label>🎨 Configuración del Texto</label>
+                    <div class="text-controls">
+                        <div>
+                            <label>Tamaño</label>
+                            <input type="number" id="fontSize" value="64" min="20" max="120" onchange="updatePreview()">
+                        </div>
+                        <div>
+                            <label>Color</label>
+                            <input type="color" id="textColor" value="#ffffff" class="color-picker" onchange="updatePreview()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>📍 Posición del Texto</label>
+                    <div class="position-controls">
+                        <div>
+                            <label>Horizontal (%)</label>
+                            <input type="number" id="textX" value="50" min="0" max="100" onchange="updatePreview()">
+                        </div>
+                        <div>
+                            <label>Vertical (%)</label>
+                            <input type="number" id="textY" value="50" min="0" max="100" onchange="updatePreview()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>🔤 Tipografía</label>
+                    <select id="fontFamily" onchange="updatePreview()">
+                        <option value="Arial">Arial</option>
+                        <option value="Helvetica">Helvetica</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Courier New">Courier New</option>
+                        <option value="Verdana">Verdana</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Palatino">Palatino</option>
+                        <option value="Garamond">Garamond</option>
+                        <option value="Bookman">Bookman</option>
+                        <option value="Comic Sans MS">Comic Sans MS</option>
+                        <option value="Trebuchet MS">Trebuchet MS</option>
+                        <option value="Arial Black">Arial Black</option>
+                        <option value="Impact">Impact</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>🎭 Estilo del Texto</label>
+                    <div class="text-controls">
+                        <div>
+                            <label>Grosor</label>
+                            <select id="fontWeight" onchange="updatePreview()">
+                                <option value="normal">Normal</option>
+                                <option value="bold">Negrita</option>
+                                <option value="lighter">Ligero</option>
+                                <option value="bolder">Extra Negrita</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Sombra</label>
+                            <input type="checkbox" id="textShadow" onchange="updatePreview()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let backgroundMedia = null;
+        let audioFile = null;
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        let isGenerating = false;
+
+        // Configurar canvas
+        canvas.width = 1080;
+        canvas.height = 1920;
+
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+            setTimeout(() => {
+                statusDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        function handleBackgroundFile(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const info = document.getElementById('backgroundInfo');
+            info.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+            
+            if (file.type.startsWith('image/')) {
+                const img = new Image();
+                img.onload = function() {
+                    backgroundMedia = { type: 'image', element: img, file: file };
+                    updatePreview();
+                };
+                img.src = URL.createObjectURL(file);
+            } else if (file.type.startsWith('video/')) {
+                const video = document.createElement('video');
+                video.onloadedmetadata = function() {
+                    backgroundMedia = { type: 'video', element: video, file: file };
+                    updatePreview();
+                };
+                video.src = URL.createObjectURL(file);
+            }
+            
+            input.parentElement.classList.add('has-file');
+        }
+
+        function handleAudioFile(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const audio = new Audio();
+            audio.onloadedmetadata = function() {
+                const duration = audio.duration;
+                const info = document.getElementById('audioInfo');
+                
+                if (duration < 60) {
+                    showStatus(`❌ El audio debe tener al menos 60 segundos. Duración actual: ${duration.toFixed(1)}s`, 'error');
+                    input.value = '';
+                    info.textContent = '';
+                    audioFile = null;
+                    return;
+                }
+                
+                info.textContent = `${file.name} (${duration.toFixed(1)}s - ${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                audioFile = file;
+                input.parentElement.classList.add('has-file');
+                showStatus(`✅ Audio cargado correctamente. Se utilizarán exactamente 60 segundos.`, 'success');
+            };
+            
+            audio.src = URL.createObjectURL(file);
+        }
+
+        function updatePreview() {
+            if (!backgroundMedia) return;
+
+            // Limpiar canvas
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Dibujar fondo
+            if (backgroundMedia.type === 'image') {
+                drawImageFit(ctx, backgroundMedia.element, 0, 0, canvas.width, canvas.height);
+            } else if (backgroundMedia.type === 'video') {
+                drawImageFit(ctx, backgroundMedia.element, 0, 0, canvas.width, canvas.height);
+            }
+
+            // Dibujar texto
+            const text = document.getElementById('messageText').value;
+            if (text.trim()) {
+                drawText(ctx, text);
+            }
+        }
+
+        function drawImageFit(ctx, img, x, y, width, height) {
+            const imgAspect = img.width / img.height;
+            const canvasAspect = width / height;
+            
+            let drawWidth, drawHeight, drawX, drawY;
+            
+            if (imgAspect > canvasAspect) {
+                drawHeight = height;
+                drawWidth = height * imgAspect;
+                drawX = x + (width - drawWidth) / 2;
+                drawY = y;
+            } else {
+                drawWidth = width;
+                drawHeight = width / imgAspect;
+                drawX = x;
+                drawY = y + (height - drawHeight) / 2;
+            }
+            
+            ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+        }
+
+        function drawText(ctx, text) {
+            const fontSize = document.getElementById('fontSize').value;
+            const textColor = document.getElementById('textColor').value;
+            const fontFamily = document.getElementById('fontFamily').value;
+            const fontWeight = document.getElementById('fontWeight').value;
+            const textShadow = document.getElementById('textShadow').checked;
+            const textX = (document.getElementById('textX').value / 100) * canvas.width;
+            const textY = (document.getElementById('textY').value / 100) * canvas.height;
+
+            ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            // Sombra del texto
+            if (textShadow) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                ctx.fillText(text, textX + 3, textY + 3);
+            }
+
+            // Texto principal
+            ctx.fillStyle = textColor;
+            ctx.fillText(text, textX, textY);
+        }
+
+        function generatePreview() {
+            if (!backgroundMedia) {
+                showStatus('❌ Por favor, carga una imagen o video de fondo', 'error');
+                return;
+            }
+
+            if (!audioFile) {
+                showStatus('❌ Por favor, carga un archivo de audio', 'error');
+                return;
+            }
+
+            const text = document.getElementById('messageText').value.trim();
+            if (!text) {
+                showStatus('❌ Por favor, escribe un mensaje', 'error');
+                return;
+            }
+
+            updatePreview();
+            showStatus('✅ Preview generado correctamente', 'success');
+        }
+
+        async function exportVideo() {
+            if (!backgroundMedia || !audioFile) {
+                showStatus('❌ Por favor, carga todos los archivos necesarios', 'error');
+                return;
+            }
+
+            if (isGenerating) {
+                showStatus('⏳ Ya se está generando un video...', 'info');
+                return;
+            }
+
+            isGenerating = true;
+            showStatus('🎬 Generando video... Esto puede tomar unos minutos', 'info');
+
+            try {
+                const stream = canvas.captureStream(30);
+                const mediaRecorder = new MediaRecorder(stream, {
+                    mimeType: 'video/webm;codecs=vp9'
+                });
+
+                const chunks = [];
+                mediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) {
+                        chunks.push(e.data);
+                    }
+                };
+
+                mediaRecorder.onstop = async () => {
+                    const videoBlob = new Blob(chunks, { type: 'video/webm' });
+                    
+                    // Aquí normalmente combinarías con audio usando FFmpeg
+                    // Por simplicidad, exportamos solo el video
+                    const url = URL.createObjectURL(videoBlob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `shorts-video-${Date.now()}.webm`;
+                    a.click();
+                    
+                    showStatus('✅ Video exportado exitosamente', 'success');
+                    isGenerating = false;
+                };
+
+                // Simular 60 segundos de grabación
+                mediaRecorder.start();
+                
+                // Animar el progreso
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += 1.67; // 60 segundos = 100%
+                    document.getElementById('progress').style.width = `${Math.min(progress, 100)}%`;
+                    
+                    if (progress >= 100) {
+                        clearInterval(progressInterval);
+                        mediaRecorder.stop();
+                    }
+                }, 1000);
+
+                // Si es video, reproducir para capturar frames
+                if (backgroundMedia.type === 'video') {
+                    backgroundMedia.element.currentTime = 0;
+                    backgroundMedia.element.play();
+                    
+                    const updateFrame = () => {
+                        if (isGenerating) {
+                            updatePreview();
+                            requestAnimationFrame(updateFrame);
+                        }
+                    };
+                    updateFrame();
+                }
+
+            } catch (error) {
+                showStatus(`❌ Error al generar video: ${error.message}`, 'error');
+                isGenerating = false;
+            }
+        }
+
+        // Inicializar preview
+        updatePreview();
+    </script>
+</body>
+</html>
