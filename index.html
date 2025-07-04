@@ -16,10 +16,14 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .container {
             max-width: 1200px;
+            width: 100%;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
@@ -57,6 +61,8 @@
             padding: 30px;
             border-radius: 15px;
             border: 2px solid #e9ecef;
+            max-height: 700px;
+            overflow-y: auto;
         }
 
         .control-group {
@@ -71,7 +77,7 @@
             font-size: 14px;
         }
 
-        .file-input {
+        .file-input-wrapper {
             width: 100%;
             padding: 12px;
             border: 2px dashed #dee2e6;
@@ -81,15 +87,16 @@
             text-align: center;
             transition: all 0.3s ease;
         }
-
-        .file-input:hover {
+        .file-input-wrapper:hover {
             border-color: #007bff;
             background: #f8f9ff;
         }
-
-        .file-input.has-file {
+        .file-input-wrapper.has-file {
             border-color: #28a745;
             background: #f8fff8;
+        }
+        input[type="file"] {
+            display: none;
         }
 
         input[type="text"], input[type="number"], select, textarea {
@@ -111,18 +118,12 @@
             min-height: 80px;
         }
 
-        .text-controls {
+        .text-controls, .position-controls {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
         }
-
-        .position-controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
+        
         .btn {
             padding: 12px 24px;
             border: none;
@@ -135,12 +136,17 @@
             letter-spacing: 1px;
         }
 
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .btn-primary {
             background: linear-gradient(135deg, #007bff, #0056b3);
             color: white;
         }
-
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             background: linear-gradient(135deg, #0056b3, #004085);
             transform: translateY(-2px);
         }
@@ -149,50 +155,45 @@
             background: linear-gradient(135deg, #28a745, #1e7e34);
             color: white;
         }
-
-        .btn-success:hover {
+        .btn-success:hover:not(:disabled) {
             background: linear-gradient(135deg, #1e7e34, #155724);
             transform: translateY(-2px);
         }
-
-        .btn-warning {
-            background: linear-gradient(135deg, #ffc107, #e0a800);
-            color: #212529;
-        }
-
-        .btn-warning:hover {
-            background: linear-gradient(135deg, #e0a800, #d39e00);
-            transform: translateY(-2px);
-        }
-
+        
         .preview-container {
             position: relative;
             background: #000;
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
         }
 
         .canvas-container {
             position: relative;
             width: 100%;
-            height: 600px;
+            padding-top: 177.77%; /* 9:16 Aspect Ratio */
             background: #000;
         }
 
         #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             object-fit: contain;
         }
 
         .progress-bar {
-            width: 100%;
+            width: 90%;
+            margin: 0 auto;
             height: 4px;
             background: #e9ecef;
             border-radius: 2px;
             overflow: hidden;
-            margin: 20px 0;
+            margin-top: 20px;
         }
 
         .progress-fill {
@@ -202,28 +203,19 @@
             transition: width 0.3s ease;
         }
 
-        .status {
+        #status {
+            padding: 10px;
+            min-height: 40px;
+        }
+        .status-msg {
             text-align: center;
             padding: 10px;
             border-radius: 8px;
-            margin: 10px 0;
             font-weight: 600;
         }
-
-        .status.success {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status.error {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .status.info {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
+        .status-msg.success { background: #d4edda; color: #155724; }
+        .status-msg.error { background: #f8d7da; color: #721c24; }
+        .status-msg.info { background: #d1ecf1; color: #0c5460; }
 
         .file-info {
             font-size: 12px;
@@ -231,23 +223,30 @@
             margin-top: 5px;
         }
 
-        .color-picker {
-            width: 50px;
-            height: 40px;
-            border: none;
+        .color-picker-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            border: 2px solid #dee2e6;
             border-radius: 8px;
+            overflow: hidden;
+        }
+        input[type="color"] {
+            width: 100%;
+            height: 45px;
+            border: none;
             cursor: pointer;
+            padding: 0;
+            margin: 0;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 992px) {
             .main-content {
                 grid-template-columns: 1fr;
-                gap: 20px;
             }
-            
-            .text-controls,
-            .position-controls {
-                grid-template-columns: 1fr;
+            .controls {
+                max-height: none;
             }
         }
     </style>
@@ -262,16 +261,16 @@
         <div class="main-content">
             <div class="preview-container">
                 <div class="canvas-container">
-                    <canvas id="canvas" width="1080" height="1920"></canvas>
+                    <canvas id="canvas"></canvas>
                 </div>
                 
                 <div class="progress-bar">
                     <div class="progress-fill" id="progress"></div>
                 </div>
                 
-                <div style="text-align: center; padding: 20px;">
-                    <button class="btn btn-primary" onclick="generatePreview()">🎬 Generar Preview</button>
-                    <button class="btn btn-success" onclick="exportVideo()">📤 Exportar Video</button>
+                <div style="text-align: center; padding: 20px; display: flex; gap: 10px; justify-content: center;">
+                    <button class="btn btn-primary" id="generatePreviewBtn">🎬 Generar Preview</button>
+                    <button class="btn btn-success" id="exportVideoBtn">📤 Exportar Video</button>
                 </div>
                 
                 <div id="status"></div>
@@ -279,35 +278,58 @@
 
             <div class="controls">
                 <div class="control-group">
-                    <label>🖼️ Imagen/Video de Fondo</label>
-                    <input type="file" id="backgroundFile" accept="image/*,video/*" onchange="handleBackgroundFile(this)">
+                    <label for="backgroundFileInput">🖼️ Imagen/Video de Fondo</label>
+                    <label class="file-input-wrapper" id="backgroundFileWrapper">
+                        <span>Seleccionar archivo...</span>
+                        <input type="file" id="backgroundFileInput" accept="image/*,video/*">
+                    </label>
                     <div class="file-info" id="backgroundInfo"></div>
                 </div>
 
                 <div class="control-group">
-                    <label>🎵 Audio (preferiblemente 60+ segundos)</label>
-                    <input type="file" id="audioFile" accept="audio/*,.mp3,.wav,.m4a,.aac,.ogg,.flac" onchange="handleAudioFile(this)">
+                    <label for="audioFileInput">🎵 Audio (preferiblemente 60s)</label>
+                    <label class="file-input-wrapper" id="audioFileWrapper">
+                        <span>Seleccionar archivo...</span>
+                        <input type="file" id="audioFileInput" accept="audio/*">
+                    </label>
                     <div class="file-info" id="audioInfo"></div>
-                    <small style="color: #6c757d; font-size: 12px;">
-                        Formatos soportados: MP3, WAV, M4A, AAC, OGG, FLAC
-                    </small>
                 </div>
 
                 <div class="control-group">
-                    <label>💬 Mensaje</label>
-                    <textarea id="messageText" placeholder="Escribe tu mensaje aquí..." onchange="updatePreview()"></textarea>
+                    <label for="messageText">💬 Mensaje</label>
+                    <textarea id="messageText" placeholder="Escribe tu mensaje aquí..."></textarea>
                 </div>
 
                 <div class="control-group">
                     <label>🎨 Configuración del Texto</label>
                     <div class="text-controls">
                         <div>
-                            <label>Tamaño</label>
-                            <input type="number" id="fontSize" value="64" min="20" max="120" onchange="updatePreview()">
+                            <label for="fontSize">Tamaño</label>
+                            <input type="number" id="fontSize" value="64" min="20" max="120">
                         </div>
                         <div>
-                            <label>Color</label>
-                            <input type="color" id="textColor" value="#ffffff" class="color-picker" onchange="updatePreview()">
+                            <label for="textColor">Color</label>
+                            <div class="color-picker-wrapper">
+                               <input type="color" id="textColor" value="#ffffff">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controles añadidos que faltaban -->
+                <div class="control-group">
+                    <div class="text-controls">
+                        <div>
+                            <label for="fontWeight">Grosor</label>
+                            <select id="fontWeight">
+                                <option value="normal">Normal</option>
+                                <option value="bold" selected>Negrita</option>
+                                <option value="bolder">Más Grueso</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="textShadow">Sombra</label>
+                            <input type="checkbox" id="textShadow" checked style="width: 20px; height: 20px; margin-top: 10px;">
                         </div>
                     </div>
                 </div>
@@ -316,203 +338,142 @@
                     <label>📍 Posición del Texto</label>
                     <div class="position-controls">
                         <div>
-                            <label>Horizontal (%)</label>
-                            <input type="number" id="textX" value="50" min="0" max="100" onchange="updatePreview()">
+                            <label for="textX">Horizontal (%)</label>
+                            <input type="number" id="textX" value="50" min="0" max="100">
                         </div>
                         <div>
-                            <label>Vertical (%)</label>
-                            <input type="number" id="textY" value="50" min="0" max="100" onchange="updatePreview()">
+                            <label for="textY">Vertical (%)</label>
+                            <input type="number" id="textY" value="50" min="0" max="100">
                         </div>
                     </div>
                 </div>
 
                 <div class="control-group">
-                    <label>🔤 Tipografía</label>
-                    <select id="fontFamily" onchange="updatePreview()">
+                    <label for="fontFamily">🔤 Tipografía</label>
+                    <select id="fontFamily">
+                        <option value="Impact">Impact</option>
                         <option value="Arial">Arial</option>
                         <option value="Helvetica">Helvetica</option>
-                        <option value="Times New Roman">Times New Roman</option>
-                        <option value="Courier New">Courier New</option>
                         <option value="Verdana">Verdana</option>
-                        <option value="Georgia">Georgia</option>
-                        <option value="Palatino">Palatino</option>
-                        <option value="Garamond">Garamond</option>
-                        <option value="Bookman">Bookman</option>
                         <option value="Comic Sans MS">Comic Sans MS</option>
-                        <option value="Trebuchet MS">Trebuchet MS</option>
-                        <option value="Arial Black">Arial Black</option>
-                        <option value="Impact">Impact</option>
                     </select>
-                </div>
-
-                <div class="control-group">
-                    <label>🎭 Estilo del Texto</label>
-                    <div class="text-controls">
-                        <div>
-                            <label>Grosor</label>
-                            <select id="fontWeight" onchange="updatePreview()">
-                                <option value="normal">Normal</option>
-                                <option value="bold">Negrita</option>
-                                <option value="lighter">Ligero</option>
-                                <option value="bolder">Extra Negrita</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label>Sombra</label>
-                            <input type="checkbox" id="textShadow" onchange="updatePreview()">
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Referencias a elementos del DOM
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const backgroundFileInput = document.getElementById('backgroundFileInput');
+        const audioFileInput = document.getElementById('audioFileInput');
+        const generatePreviewBtn = document.getElementById('generatePreviewBtn');
+        const exportVideoBtn = document.getElementById('exportVideoBtn');
+        const allControls = document.querySelectorAll('#messageText, #fontSize, #textColor, #fontWeight, #textShadow, #textX, #textY, #fontFamily');
+
         let backgroundMedia = null;
         let audioFile = null;
-        let canvas = document.getElementById('canvas');
-        let ctx = canvas.getContext('2d');
         let isGenerating = false;
-
-        // Configurar canvas
+        
+        // Configuración inicial del canvas
         canvas.width = 1080;
         canvas.height = 1920;
 
-        function showStatus(message, type = 'info') {
+        function showStatus(message, type = 'info', duration = 5000) {
             const statusDiv = document.getElementById('status');
-            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
-            setTimeout(() => {
-                statusDiv.innerHTML = '';
-            }, 5000);
+            statusDiv.innerHTML = `<div class="status-msg ${type}">${message}</div>`;
+            if (duration > 0) {
+                setTimeout(() => {
+                    statusDiv.innerHTML = '';
+                }, duration);
+            }
         }
 
-        function handleBackgroundFile(input) {
-            const file = input.files[0];
+        function updateButtonStates() {
+            exportVideoBtn.disabled = isGenerating;
+            generatePreviewBtn.disabled = isGenerating;
+        }
+
+        function handleBackgroundFile(file) {
             if (!file) return;
 
+            const wrapper = document.getElementById('backgroundFileWrapper');
             const info = document.getElementById('backgroundInfo');
             info.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-            
+            wrapper.querySelector('span').textContent = 'Cambiando archivo...';
+            wrapper.classList.add('has-file');
+
+            const fileURL = URL.createObjectURL(file);
+
             if (file.type.startsWith('image/')) {
                 const img = new Image();
-                img.onload = function() {
-                    backgroundMedia = { type: 'image', element: img, file: file };
+                img.onload = () => {
+                    backgroundMedia = { type: 'image', element: img, url: fileURL };
                     updatePreview();
                 };
-                img.src = URL.createObjectURL(file);
+                img.src = fileURL;
             } else if (file.type.startsWith('video/')) {
                 const video = document.createElement('video');
-                video.onloadedmetadata = function() {
-                    backgroundMedia = { type: 'video', element: video, file: file };
+                video.muted = true;
+                video.loop = true;
+                video.playsInline = true;
+                video.onloadeddata = () => {
+                    backgroundMedia = { type: 'video', element: video, url: fileURL };
+                    video.play();
                     updatePreview();
                 };
-                video.src = URL.createObjectURL(file);
+                video.src = fileURL;
             }
-            
-            input.parentElement.classList.add('has-file');
         }
 
-        function handleAudioFile(input) {
-            const file = input.files[0];
+        function handleAudioFile(file) {
             if (!file) return;
-
+            
+            const wrapper = document.getElementById('audioFileWrapper');
             const info = document.getElementById('audioInfo');
-            showStatus(`⏳ Cargando audio: ${file.name}...`, 'info');
-
-            // Primero, aceptar el archivo y mostrar información básica
-            info.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB) - Verificando duración...`;
+            wrapper.querySelector('span').textContent = 'Cambiando archivo...';
+            wrapper.classList.add('has-file');
             
             const audio = new Audio();
-            
-            // Timeout para manejar archivos que no cargan
-            const timeout = setTimeout(() => {
-                // Si no se puede verificar la duración, aceptar el archivo de todos modos
-                showStatus(`⚠️ No se pudo verificar la duración del audio, pero se ha cargado. Asegúrate de que tenga al menos 60 segundos.`, 'info');
-                info.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB) - Duración no verificada`;
+            audio.onloadedmetadata = () => {
+                info.textContent = `${file.name} (${audio.duration.toFixed(1)}s)`;
+                showStatus('✅ Audio cargado.', 'success');
                 audioFile = file;
-                input.parentElement.classList.add('has-file');
-            }, 3000);
-
-            audio.onloadedmetadata = function() {
-                clearTimeout(timeout);
-                const duration = audio.duration;
-                
-                if (duration && duration < 60) {
-                    showStatus(`❌ El audio debe tener al menos 60 segundos. Duración actual: ${duration.toFixed(1)}s`, 'error');
-                    input.value = '';
-                    info.textContent = '';
-                    audioFile = null;
-                    input.parentElement.classList.remove('has-file');
-                    return;
-                }
-                
-                if (duration) {
-                    info.textContent = `${file.name} (${duration.toFixed(1)}s - ${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-                    showStatus(`✅ Audio cargado correctamente. Se utilizarán exactamente 60 segundos.`, 'success');
-                } else {
-                    info.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB) - Duración no determinada`;
-                    showStatus(`⚠️ Audio cargado. No se pudo determinar la duración exacta.`, 'info');
-                }
-                
-                audioFile = file;
-                input.parentElement.classList.add('has-file');
             };
-            
-            audio.onerror = function() {
-                clearTimeout(timeout);
-                // En caso de error, aún permitir el archivo
-                showStatus(`⚠️ No se pudo verificar el audio, pero se ha cargado. Formato: ${file.type || 'desconocido'}`, 'info');
-                info.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB) - Formato: ${file.type || 'desconocido'}`;
-                audioFile = file;
-                input.parentElement.classList.add('has-file');
+            audio.onerror = () => {
+                showStatus('❌ No se pudo cargar el archivo de audio.', 'error');
+                info.textContent = '';
+                wrapper.classList.remove('has-file');
             };
-            
             audio.src = URL.createObjectURL(file);
         }
 
-        function updatePreview() {
-            if (!backgroundMedia) return;
+        function drawImageFit(img) {
+            const canvasAspect = canvas.width / canvas.height;
+            const imgAspect = (img.videoWidth || img.width) / (img.videoHeight || img.height);
+            
+            let drawWidth, drawHeight, dx, dy;
 
-            // Limpiar canvas
-            ctx.fillStyle = '#000000';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Dibujar fondo
-            if (backgroundMedia.type === 'image') {
-                drawImageFit(ctx, backgroundMedia.element, 0, 0, canvas.width, canvas.height);
-            } else if (backgroundMedia.type === 'video') {
-                drawImageFit(ctx, backgroundMedia.element, 0, 0, canvas.width, canvas.height);
+            if (imgAspect > canvasAspect) { // La imagen es más ancha que el canvas
+                drawHeight = canvas.height;
+                drawWidth = drawHeight * imgAspect;
+                dx = (canvas.width - drawWidth) / 2;
+                dy = 0;
+            } else { // La imagen es más alta o igual
+                drawWidth = canvas.width;
+                drawHeight = drawWidth / imgAspect;
+                dx = 0;
+                dy = (canvas.height - drawHeight) / 2;
             }
+            ctx.drawImage(img, dx, dy, drawWidth, drawHeight);
+        }
 
-            // Dibujar texto
+        function drawText() {
             const text = document.getElementById('messageText').value;
-            if (text.trim()) {
-                drawText(ctx, text);
-            }
-        }
+            if (!text.trim()) return;
 
-        function drawImageFit(ctx, img, x, y, width, height) {
-            const imgAspect = img.width / img.height;
-            const canvasAspect = width / height;
-            
-            let drawWidth, drawHeight, drawX, drawY;
-            
-            if (imgAspect > canvasAspect) {
-                drawHeight = height;
-                drawWidth = height * imgAspect;
-                drawX = x + (width - drawWidth) / 2;
-                drawY = y;
-            } else {
-                drawWidth = width;
-                drawHeight = width / imgAspect;
-                drawX = x;
-                drawY = y + (height - drawHeight) / 2;
-            }
-            
-            ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
-        }
-
-        function drawText(ctx, text) {
             const fontSize = document.getElementById('fontSize').value;
             const textColor = document.getElementById('textColor').value;
             const fontFamily = document.getElementById('fontFamily').value;
@@ -525,128 +486,148 @@
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
 
-            // Sombra del texto
             if (textShadow) {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-                ctx.fillText(text, textX + 3, textY + 3);
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.75)';
+                ctx.shadowBlur = 5;
+                ctx.shadowOffsetX = 3;
+                ctx.shadowOffsetY = 3;
             }
 
-            // Texto principal
             ctx.fillStyle = textColor;
             ctx.fillText(text, textX, textY);
+            
+            // Reset shadow for other drawings
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
         }
 
-        function generatePreview() {
-            if (!backgroundMedia) {
-                showStatus('❌ Por favor, carga una imagen o video de fondo', 'error');
-                return;
-            }
+        function updatePreview() {
+            if (isGenerating) return;
 
-            if (!audioFile) {
-                showStatus('❌ Por favor, carga un archivo de audio', 'error');
-                return;
-            }
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            const text = document.getElementById('messageText').value.trim();
-            if (!text) {
-                showStatus('❌ Por favor, escribe un mensaje', 'error');
-                return;
+            if (backgroundMedia) {
+                drawImageFit(backgroundMedia.element);
+            } else {
+                ctx.fillStyle = '#666';
+                ctx.font = '48px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('Carga un fondo', canvas.width / 2, canvas.height / 2);
             }
+            drawText();
 
-            updatePreview();
-            showStatus('✅ Preview generado correctamente', 'success');
+            if (backgroundMedia && backgroundMedia.type === 'video') {
+                requestAnimationFrame(updatePreview);
+            }
         }
 
         async function exportVideo() {
-            if (!backgroundMedia) {
-                showStatus('❌ Por favor, carga una imagen o video de fondo', 'error');
+            if (!backgroundMedia || !audioFile) {
+                showStatus('❌ Carga un fondo y un audio para exportar.', 'error');
                 return;
             }
-
-            if (!audioFile) {
-                showStatus('❌ Por favor, carga un archivo de audio válido', 'error');
-                return;
-            }
-
-            const text = document.getElementById('messageText').value.trim();
-            if (!text) {
-                showStatus('❌ Por favor, escribe un mensaje', 'error');
-                return;
-            }
-
-            if (isGenerating) {
-                showStatus('⏳ Ya se está generando un video...', 'info');
-                return;
-            }
+            if (isGenerating) return;
 
             isGenerating = true;
-            showStatus('🎬 Generando video... Esto puede tomar unos minutos', 'info');
+            updateButtonStates();
+            showStatus('🎬 Iniciando exportación... Esto puede tardar.', 'info', 0);
 
             try {
-                const stream = canvas.captureStream(30);
-                const mediaRecorder = new MediaRecorder(stream, {
-                    mimeType: 'video/webm;codecs=vp9'
-                });
+                // 1. Crear AudioContext y procesar el audio
+                const audioContext = new AudioContext();
+                const audioBuffer = await audioContext.decodeAudioData(await audioFile.arrayBuffer());
+                const audioSource = audioContext.createBufferSource();
+                audioSource.buffer = audioBuffer;
+                
+                const audioDestination = audioContext.createMediaStreamDestination();
+                audioSource.connect(audioDestination);
+                
+                const audioTrack = audioDestination.stream.getAudioTracks()[0];
 
+                // 2. Preparar el stream de video del canvas
+                const videoStream = canvas.captureStream(30); // 30 FPS
+                const videoTrack = videoStream.getVideoTracks()[0];
+
+                // 3. Combinar pistas de audio y video
+                const combinedStream = new MediaStream([videoTrack, audioTrack]);
+
+                // 4. Configurar y empezar MediaRecorder
+                const recorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm;codecs=vp9,opus' });
                 const chunks = [];
-                mediaRecorder.ondataavailable = (e) => {
-                    if (e.data.size > 0) {
-                        chunks.push(e.data);
-                    }
-                };
+                recorder.ondataavailable = e => chunks.push(e.data);
 
-                mediaRecorder.onstop = async () => {
-                    const videoBlob = new Blob(chunks, { type: 'video/webm' });
-                    
-                    // Aquí normalmente combinarías con audio usando FFmpeg
-                    // Por simplicidad, exportamos solo el video
-                    const url = URL.createObjectURL(videoBlob);
+                recorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'video/webm' });
+                    const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
                     a.download = `shorts-video-${Date.now()}.webm`;
+                    document.body.appendChild(a);
                     a.click();
-                    
-                    showStatus('✅ Video exportado exitosamente', 'success');
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+
+                    showStatus('✅ ¡Video exportado con éxito!', 'success');
                     isGenerating = false;
+                    updateButtonStates();
+                    document.getElementById('progress').style.width = '0%';
                 };
 
-                // Simular 60 segundos de grabación
-                mediaRecorder.start();
+                recorder.start();
+                audioSource.start();
                 
-                // Animar el progreso
-                let progress = 0;
-                const progressInterval = setInterval(() => {
-                    progress += 1.67; // 60 segundos = 100%
-                    document.getElementById('progress').style.width = `${Math.min(progress, 100)}%`;
-                    
-                    if (progress >= 100) {
-                        clearInterval(progressInterval);
-                        mediaRecorder.stop();
-                    }
-                }, 1000);
+                // Empezar a dibujar en el canvas para la grabación
+                let startTime = Date.now();
+                const duration = 60000; // 60 segundos
+                const videoElement = backgroundMedia.type === 'video' ? backgroundMedia.element : null;
+                if(videoElement) videoElement.currentTime = 0;
 
-                // Si es video, reproducir para capturar frames
-                if (backgroundMedia.type === 'video') {
-                    backgroundMedia.element.currentTime = 0;
-                    backgroundMedia.element.play();
+                function recordFrame() {
+                    if (!isGenerating) return;
+
+                    const elapsedTime = Date.now() - startTime;
+                    if (elapsedTime >= duration) {
+                        recorder.stop();
+                        return;
+                    }
+
+                    // Actualizar canvas
+                    ctx.fillStyle = '#000';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    if (backgroundMedia) drawImageFit(backgroundMedia.element);
+                    drawText();
                     
-                    const updateFrame = () => {
-                        if (isGenerating) {
-                            updatePreview();
-                            requestAnimationFrame(updateFrame);
-                        }
-                    };
-                    updateFrame();
+                    // Actualizar progreso
+                    document.getElementById('progress').style.width = `${(elapsedTime / duration) * 100}%`;
+                    
+                    requestAnimationFrame(recordFrame);
                 }
+                
+                recordFrame();
 
             } catch (error) {
-                showStatus(`❌ Error al generar video: ${error.message}`, 'error');
+                console.error("Error exporting video:", error);
+                showStatus(`❌ Error al exportar: ${error.message}`, 'error');
                 isGenerating = false;
+                updateButtonStates();
             }
         }
 
-        // Inicializar preview
+        // Event Listeners
+        backgroundFileInput.addEventListener('change', (e) => handleBackgroundFile(e.target.files[0]));
+        audioFileInput.addEventListener('change', (e) => handleAudioFile(e.target.files[0]));
+        generatePreviewBtn.addEventListener('click', updatePreview);
+        exportVideoBtn.addEventListener('click', exportVideo);
+        allControls.forEach(el => el.addEventListener('input', updatePreview));
+
+        // Inicialización
         updatePreview();
+        updateButtonStates();
+    });
     </script>
 </body>
 </html>
