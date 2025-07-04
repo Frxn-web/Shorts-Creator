@@ -49,6 +49,31 @@
             opacity: 0.9;
         }
 
+        /* --- Contenedores de Publicidad --- */
+        .ad-container {
+            padding: 15px 0;
+            background-color: #f1f1f1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 90px;
+            text-align: center;
+        }
+
+        .ad-728x90 { display: none; }
+        .ad-468x60 { display: none; }
+        .ad-320x50 { display: block; } /* Default for mobile */
+
+        @media (min-width: 768px) {
+            .ad-728x90 { display: inline-block; }
+            .ad-468x60, .ad-320x50 { display: none; }
+        }
+        @media (min-width: 500px) and (max-width: 767px) {
+            .ad-468x60 { display: inline-block; }
+            .ad-728x90, .ad-320x50 { display: none; }
+        }
+        /* --- Fin de Estilos de Publicidad --- */
+
         .main-content {
             display: grid;
             grid-template-columns: 1fr 400px;
@@ -63,10 +88,18 @@
             border: 2px solid #e9ecef;
             max-height: 700px;
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
 
         .control-group {
             margin-bottom: 25px;
+        }
+        
+        .ad-container-sidebar {
+            margin-top: auto; /* Empuja el anuncio al final */
+            padding-top: 20px;
+            text-align: center;
         }
 
         .control-group label {
@@ -240,6 +273,12 @@
             padding: 0;
             margin: 0;
         }
+        
+        .ad-container-bottom {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f8f9fa;
+        }
 
         @media (max-width: 992px) {
             .main-content {
@@ -258,108 +297,211 @@
             <p>Crea videos verticales para YouTube Shorts y TikTok</p>
         </div>
 
+        <!-- =========== ESPACIO PUBLICITARIO SUPERIOR (RESPONSIVE) =========== -->
+        <div class="ad-container">
+            <div class="ad-728x90">
+                <script type="text/javascript">
+                    atOptions = {
+                        'key' : 'fc2031732d42c34efb64a6b4d3b9c304',
+                        'format' : 'iframe',
+                        'height' : 90,
+                        'width' : 728,
+                        'params' : {}
+                    };
+                </script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/fc2031732d42c34efb64a6b4d3b9c304/invoke.js"></script>
+            </div>
+            <div class="ad-468x60">
+                <script type="text/javascript">
+                    atOptions = {
+                        'key' : 'dd18e7ba1063c18cdd54c5faec8c13ea',
+                        'format' : 'iframe',
+                        'height' : 60,
+                        'width' : 468,
+                        'params' : {}
+                    };
+                </script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/dd18e7ba1063c18cdd54c5faec8c13ea/invoke.js"></script>
+            </div>
+            <div class="ad-320x50">
+                <script type="text/javascript">
+                    atOptions = {
+                        'key' : 'f7a4a5b00b2410014c0599faec7ff86d',
+                        'format' : 'iframe',
+                        'height' : 50,
+                        'width' : 320,
+                        'params' : {}
+                    };
+                </script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/f7a4a5b00b2410014c0599faec7ff86d/invoke.js"></script>
+            </div>
+        </div>
+        <!-- ==================================================================== -->
+
         <div class="main-content">
-            <div class="preview-container">
-                <div class="canvas-container">
-                    <canvas id="canvas"></canvas>
+            <div class="preview-section"> <!-- Wrapper for preview and its ad -->
+                <div class="preview-container">
+                    <div class="canvas-container">
+                        <canvas id="canvas"></canvas>
+                    </div>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress"></div>
+                    </div>
+                    
+                    <div style="text-align: center; padding: 20px; display: flex; gap: 10px; justify-content: center;">
+                        <button class="btn btn-primary" id="generatePreviewBtn">🎬 Actualizar Preview</button>
+                        <button class="btn btn-success" id="exportVideoBtn">📤 Exportar Video</button>
+                    </div>
+                    
+                    <div id="status"></div>
                 </div>
-                
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progress"></div>
+                 <!-- =========== NUEVO ESPACIO PUBLICITARIO DEBAJO DEL PREVIEW =========== -->
+                <div class="ad-container ad-container-bottom">
+                     <div class="ad-728x90">
+                        <script type="text/javascript">
+                            atOptions = { 'key' : 'fc2031732d42c34efb64a6b4d3b9c304', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {} };
+                        </script>
+                        <script type="text/javascript" src="//www.highperformanceformat.com/fc2031732d42c34efb64a6b4d3b9c304/invoke.js"></script>
+                    </div>
+                    <div class="ad-468x60">
+                        <script type="text/javascript">
+                            atOptions = { 'key' : 'dd18e7ba1063c18cdd54c5faec8c13ea', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {} };
+                        </script>
+                        <script type="text/javascript" src="//www.highperformanceformat.com/dd18e7ba1063c18cdd54c5faec8c13ea/invoke.js"></script>
+                    </div>
+                    <div class="ad-320x50">
+                        <script type="text/javascript">
+                            atOptions = { 'key' : 'f7a4a5b00b2410014c0599faec7ff86d', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+                        </script>
+                        <script type="text/javascript" src="//www.highperformanceformat.com/f7a4a5b00b2410014c0599faec7ff86d/invoke.js"></script>
+                    </div>
                 </div>
-                
-                <div style="text-align: center; padding: 20px; display: flex; gap: 10px; justify-content: center;">
-                    <button class="btn btn-primary" id="generatePreviewBtn">🎬 Generar Preview</button>
-                    <button class="btn btn-success" id="exportVideoBtn">📤 Exportar Video</button>
-                </div>
-                
-                <div id="status"></div>
+                <!-- ======================================================================= -->
             </div>
 
             <div class="controls">
-                <div class="control-group">
-                    <label for="backgroundFileInput">🖼️ Imagen/Video de Fondo</label>
-                    <label class="file-input-wrapper" id="backgroundFileWrapper">
-                        <span>Seleccionar archivo...</span>
-                        <input type="file" id="backgroundFileInput" accept="image/*,video/*">
-                    </label>
-                    <div class="file-info" id="backgroundInfo"></div>
-                </div>
+                <div> <!-- Wrapper for controls to push ad to bottom -->
+                    <div class="control-group">
+                        <label for="backgroundFileInput">🖼️ Imagen/Video de Fondo</label>
+                        <label class="file-input-wrapper" id="backgroundFileWrapper">
+                            <span>Seleccionar archivo...</span>
+                            <input type="file" id="backgroundFileInput" accept="image/*,video/*">
+                        </label>
+                        <div class="file-info" id="backgroundInfo"></div>
+                    </div>
 
-                <div class="control-group">
-                    <label for="audioFileInput">🎵 Audio (preferiblemente 60s)</label>
-                    <label class="file-input-wrapper" id="audioFileWrapper">
-                        <span>Seleccionar archivo...</span>
-                        <input type="file" id="audioFileInput" accept="audio/*">
-                    </label>
-                    <div class="file-info" id="audioInfo"></div>
-                </div>
+                    <div class="control-group">
+                        <label for="audioFileInput">🎵 Audio</label>
+                        <label class="file-input-wrapper" id="audioFileWrapper">
+                            <span>Seleccionar archivo...</span>
+                            <input type="file" id="audioFileInput" accept="audio/*">
+                        </label>
+                        <div class="file-info" id="audioInfo"></div>
+                    </div>
 
-                <div class="control-group">
-                    <label for="messageText">💬 Mensaje</label>
-                    <textarea id="messageText" placeholder="Escribe tu mensaje aquí..."></textarea>
-                </div>
+                    <div class="control-group">
+                        <label for="messageText">💬 Mensaje</label>
+                        <textarea id="messageText" placeholder="Escribe tu mensaje aquí..."></textarea>
+                    </div>
 
-                <div class="control-group">
-                    <label>🎨 Configuración del Texto</label>
-                    <div class="text-controls">
-                        <div>
-                            <label for="fontSize">Tamaño</label>
-                            <input type="number" id="fontSize" value="64" min="20" max="120">
-                        </div>
-                        <div>
-                            <label for="textColor">Color</label>
-                            <div class="color-picker-wrapper">
-                               <input type="color" id="textColor" value="#ffffff">
+                    <div class="control-group">
+                        <label>🎨 Configuración del Texto</label>
+                        <div class="text-controls">
+                            <div>
+                                <label for="fontSize">Tamaño</label>
+                                <input type="number" id="fontSize" value="64" min="20" max="120">
+                            </div>
+                            <div>
+                                <label for="textColor">Color</label>
+                                <div class="color-picker-wrapper">
+                                   <input type="color" id="textColor" value="#ffffff">
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Controles añadidos que faltaban -->
-                <div class="control-group">
-                    <div class="text-controls">
-                        <div>
-                            <label for="fontWeight">Grosor</label>
-                            <select id="fontWeight">
-                                <option value="normal">Normal</option>
-                                <option value="bold" selected>Negrita</option>
-                                <option value="bolder">Más Grueso</option>
-                            </select>
+                    <div class="control-group">
+                        <div class="text-controls">
+                            <div>
+                                <label for="fontWeight">Grosor</label>
+                                <select id="fontWeight">
+                                    <option value="normal">Normal</option>
+                                    <option value="bold" selected>Negrita</option>
+                                    <option value="bolder">Más Grueso</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="textShadow">Sombra</label>
+                                <input type="checkbox" id="textShadow" checked style="width: 20px; height: 20px; margin-top: 10px;">
+                            </div>
                         </div>
-                        <div>
-                            <label for="textShadow">Sombra</label>
-                            <input type="checkbox" id="textShadow" checked style="width: 20px; height: 20px; margin-top: 10px;">
+                    </div>
+
+                    <div class="control-group">
+                        <label>📍 Posición del Texto</label>
+                        <div class="position-controls">
+                            <div>
+                                <label for="textX">Horizontal (%)</label>
+                                <input type="number" id="textX" value="50" min="0" max="100">
+                            </div>
+                            <div>
+                                <label for="textY">Vertical (%)</label>
+                                <input type="number" id="textY" value="50" min="0" max="100">
+                            </div>
                         </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="fontFamily">🔤 Tipografía</label>
+                        <select id="fontFamily">
+                            <option value="Impact">Impact</option>
+                            <option value="Arial">Arial</option>
+                            <option value="Helvetica">Helvetica</option>
+                            <option value="Verdana">Verdana</option>
+                            <option value="Comic Sans MS">Comic Sans MS</option>
+                        </select>
                     </div>
                 </div>
 
-                <div class="control-group">
-                    <label>📍 Posición del Texto</label>
-                    <div class="position-controls">
-                        <div>
-                            <label for="textX">Horizontal (%)</label>
-                            <input type="number" id="textX" value="50" min="0" max="100">
-                        </div>
-                        <div>
-                            <label for="textY">Vertical (%)</label>
-                            <input type="number" id="textY" value="50" min="0" max="100">
-                        </div>
-                    </div>
+                <!-- =========== ESPACIO PUBLICITARIO LATERAL =========== -->
+                <div class="ad-container-sidebar">
+                    <script type="text/javascript">
+                        atOptions = {
+                            'key' : '824260520a513eeffb4e12aad368af8c',
+                            'format' : 'iframe',
+                            'height' : 250,
+                            'width' : 300,
+                            'params' : {}
+                        };
+                    </script>
+                    <script type="text/javascript" src="//www.highperformanceformat.com/824260520a513eeffb4e12aad368af8c/invoke.js"></script>
                 </div>
-
-                <div class="control-group">
-                    <label for="fontFamily">🔤 Tipografía</label>
-                    <select id="fontFamily">
-                        <option value="Impact">Impact</option>
-                        <option value="Arial">Arial</option>
-                        <option value="Helvetica">Helvetica</option>
-                        <option value="Verdana">Verdana</option>
-                        <option value="Comic Sans MS">Comic Sans MS</option>
-                    </select>
-                </div>
+                <!-- ====================================================== -->
             </div>
         </div>
+         <!-- =========== NUEVO ESPACIO PUBLICITARIO EN EL FOOTER =========== -->
+        <footer class="ad-container">
+            <div class="ad-728x90">
+                <script type="text/javascript">
+                    atOptions = { 'key' : 'fc2031732d42c34efb64a6b4d3b9c304', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {} };
+                </script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/fc2031732d42c34efb64a6b4d3b9c304/invoke.js"></script>
+            </div>
+            <div class="ad-468x60">
+                <script type="text/javascript">
+                    atOptions = { 'key' : 'dd18e7ba1063c18cdd54c5faec8c13ea', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {} };
+                </script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/dd18e7ba1063c18cdd54c5faec8c13ea/invoke.js"></script>
+            </div>
+            <div class="ad-320x50">
+                <script type="text/javascript">
+                    atOptions = { 'key' : 'f7a4a5b00b2410014c0599faec7ff86d', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+                </script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/f7a4a5b00b2410014c0599faec7ff86d/invoke.js"></script>
+            </div>
+        </footer>
+        <!-- =============================================================== -->
     </div>
 
     <script>
@@ -413,6 +555,11 @@
                     backgroundMedia = { type: 'image', element: img, url: fileURL };
                     updatePreview();
                 };
+                img.onerror = () => {
+                    showStatus('❌ No se pudo cargar el archivo de imagen.', 'error');
+                    info.textContent = '';
+                    wrapper.classList.remove('has-file');
+                };
                 img.src = fileURL;
             } else if (file.type.startsWith('video/')) {
                 const video = document.createElement('video');
@@ -423,6 +570,11 @@
                     backgroundMedia = { type: 'video', element: video, url: fileURL };
                     video.play();
                     updatePreview();
+                };
+                video.onerror = () => {
+                    showStatus('❌ No se pudo cargar el archivo de video.', 'error');
+                    info.textContent = '';
+                    wrapper.classList.remove('has-file');
                 };
                 video.src = fileURL;
             }
@@ -456,12 +608,12 @@
             
             let drawWidth, drawHeight, dx, dy;
 
-            if (imgAspect > canvasAspect) { // La imagen es más ancha que el canvas
+            if (imgAspect > canvasAspect) {
                 drawHeight = canvas.height;
                 drawWidth = drawHeight * imgAspect;
                 dx = (canvas.width - drawWidth) / 2;
                 dy = 0;
-            } else { // La imagen es más alta o igual
+            } else {
                 drawWidth = canvas.width;
                 drawHeight = drawWidth / imgAspect;
                 dx = 0;
@@ -496,7 +648,6 @@
             ctx.fillStyle = textColor;
             ctx.fillText(text, textX, textY);
             
-            // Reset shadow for other drawings
             ctx.shadowColor = 'transparent';
             ctx.shadowBlur = 0;
             ctx.shadowOffsetX = 0;
@@ -537,9 +688,11 @@
             showStatus('🎬 Iniciando exportación... Esto puede tardar.', 'info', 0);
 
             try {
-                // 1. Crear AudioContext y procesar el audio
                 const audioContext = new AudioContext();
                 const audioBuffer = await audioContext.decodeAudioData(await audioFile.arrayBuffer());
+                
+                const duration = audioBuffer.duration * 1000;
+
                 const audioSource = audioContext.createBufferSource();
                 audioSource.buffer = audioBuffer;
                 
@@ -548,14 +701,11 @@
                 
                 const audioTrack = audioDestination.stream.getAudioTracks()[0];
 
-                // 2. Preparar el stream de video del canvas
-                const videoStream = canvas.captureStream(30); // 30 FPS
+                const videoStream = canvas.captureStream(30);
                 const videoTrack = videoStream.getVideoTracks()[0];
 
-                // 3. Combinar pistas de audio y video
                 const combinedStream = new MediaStream([videoTrack, audioTrack]);
 
-                // 4. Configurar y empezar MediaRecorder
                 const recorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm;codecs=vp9,opus' });
                 const chunks = [];
                 recorder.ondataavailable = e => chunks.push(e.data);
@@ -580,9 +730,7 @@
                 recorder.start();
                 audioSource.start();
                 
-                // Empezar a dibujar en el canvas para la grabación
                 let startTime = Date.now();
-                const duration = 60000; // 60 segundos
                 const videoElement = backgroundMedia.type === 'video' ? backgroundMedia.element : null;
                 if(videoElement) videoElement.currentTime = 0;
 
@@ -595,13 +743,11 @@
                         return;
                     }
 
-                    // Actualizar canvas
                     ctx.fillStyle = '#000';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
                     if (backgroundMedia) drawImageFit(backgroundMedia.element);
                     drawText();
                     
-                    // Actualizar progreso
                     document.getElementById('progress').style.width = `${(elapsedTime / duration) * 100}%`;
                     
                     requestAnimationFrame(recordFrame);
@@ -631,3 +777,4 @@
     </script>
 </body>
 </html>
+
